@@ -5,7 +5,11 @@ import AUTH from "../../utils/AUTH";
 import '../../App.css';
 
 const Review = props => {
-    const [user, setUser] = useState('');
+    const [user, setUser] = useState({
+        username: '',
+        firstName: '',
+        lastName: ''
+    });
     const [showModal, setModal] = useState(false);
     const [formObject, setFormObject] = useState({
         title: '',
@@ -18,8 +22,8 @@ const Review = props => {
 
     useEffect(() => {
         AUTH.getUser().then(res => {
-            setUser(res.data.user.username);
-            console.log('username: ', res.data.user.username);
+            const { username, firstName, lastName } = res.data.user
+            setUser({username, firstName, lastName});
         })
         .catch(err => console.log(err));
     }, []);
@@ -44,7 +48,9 @@ const Review = props => {
         
         if (formObject.title && formObject.location) {
             API.saveReview({
-                reviewOwner: user,
+                reviewOwner: user.username,
+                reviewOwnerFirstName: user.firstName,
+                reviewOwnerLastName: user.lastName,
                 reviewCreated: Date.now(),
                 reviewTitle: formObject.title,
                 reviewBody: formObject.message,
@@ -73,7 +79,7 @@ const Review = props => {
     return (
         <>
         <a className="button is-link" onClick={showReviewForm}>Modal</a>
-        <div style={showModal ? {display: 'block'} : {display: 'none'}} id="review-modal">
+        <div className={showModal ? 'is-active modal' : 'modal'} id="review-modal">
             <div className="modal-background"></div>
                 <div className="modal-content">
                     <div className="form">
